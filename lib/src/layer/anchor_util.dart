@@ -1,38 +1,25 @@
 import 'dart:math';
-import 'dart:ui';
 
-import 'package:flutter_map/plugin_api.dart';
-import 'package:supercluster/supercluster.dart';
+import 'package:flutter/widgets.dart';
 
 class AnchorUtil {
   static Point<double> removeClusterAnchor(
-    CustomPoint pos,
-    LayerCluster<Marker> cluster,
-    AnchorPos? clusterAnchorPos,
-    Size clusterWidgetSize,
+    Point pos,
+    Alignment clusterAlignment,
+    double width,
+    double height,
   ) {
-    final anchor = Anchor.fromPos(
-      clusterAnchorPos ?? AnchorPos.align(AnchorAlign.center),
-      clusterWidgetSize.width,
-      clusterWidgetSize.height,
-    );
-
-    return removeAnchor(
-      pos,
-      clusterWidgetSize.width,
-      clusterWidgetSize.height,
-      anchor,
-    );
+    return removeAlignment(pos, width, height, clusterAlignment);
   }
 
-  static Point<double> removeAnchor(
+  static Point<double> removeAlignment(
     Point pos,
     double width,
     double height,
-    Anchor anchor,
+    Alignment alignment,
   ) {
-    final x = (pos.x - (width - anchor.left)).toDouble();
-    final y = (pos.y - (height - anchor.top)).toDouble();
+    final x = (pos.x + alignment.x * width / 2 - width / 2).toDouble();
+    final y = (pos.y + alignment.y * height / 2 - height / 2).toDouble();
     return Point(x, y);
   }
 }

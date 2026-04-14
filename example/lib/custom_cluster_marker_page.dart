@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_supercluster/flutter_map_supercluster.dart';
 import 'package:flutter_map_supercluster_example/drawer.dart';
 import 'package:latlong2/latlong.dart';
@@ -11,13 +11,12 @@ class CustomClusterMarkerPage extends StatelessWidget {
 
   const CustomClusterMarkerPage({Key? key}) : super(key: key);
 
-  // Initialise randomly generated Markers
   static final _random = Random(42);
   static const _initialCenter = LatLng(42.0, 10.0);
   static final _markers = List<CustomMarker>.generate(
     3000,
     (_) => CustomMarker(
-      builder: (context) => const Icon(Icons.location_on),
+      child: const Icon(Icons.location_on),
       point: LatLng(
         _random.nextDouble() * 3 - 1.5 + _initialCenter.latitude,
         _random.nextDouble() * 3 - 1.5 + _initialCenter.longitude,
@@ -35,15 +34,15 @@ class CustomClusterMarkerPage extends StatelessWidget {
       drawer: buildDrawer(context, CustomClusterMarkerPage.route),
       body: FlutterMap(
         options: MapOptions(
-          center: _initialCenter,
-          zoom: 8,
+          initialCenter: _initialCenter,
+          initialZoom: 8,
         ),
         children: [
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.flutter_map_supercluster_example'
           ),
           SuperclusterLayer.immutable(
-            // Replaces MarkerLayer
             initialMarkers: _markers,
             clusterDataExtractor: (marker) =>
                 CustomClusterData(marker as CustomMarker),
@@ -93,7 +92,7 @@ class CustomMarker extends Marker {
 
   CustomMarker({
     required super.point,
-    required super.builder,
+    required super.child,
     required this.greenCount,
     required this.blueCount,
     required this.purpleCount,
@@ -119,9 +118,6 @@ class CustomClusterMarker extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
-        // For simplicity this example abuses SweepGradient to simulate a pi
-        // graph. You may be better served using a CustomPainter to draw a pi
-        // graph properly or whatever representation you prefer.
         gradient: SweepGradient(colors: const [
           Colors.green,
           Colors.green,

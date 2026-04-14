@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_supercluster/flutter_map_supercluster.dart';
 import 'package:flutter_map_supercluster_example/drawer.dart';
@@ -50,12 +50,11 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage>
 
         markers.add(
           Marker(
-            anchorPos: AnchorPos.align(AnchorAlign.top),
-            rotateAlignment: AnchorAlign.top.rotationAlignment,
+            alignment: Alignment.topCenter,
             height: 30,
             width: 30,
             point: latLng,
-            builder: (ctx) => const Icon(Icons.pin_drop),
+            child: const Icon(Icons.pin_drop),
           ),
         );
       }
@@ -105,21 +104,19 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage>
       body: FlutterMap(
         mapController: _animatedMapController.mapController,
         options: MapOptions(
-          center: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
+          initialCenter: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
               (maxLatLng.longitude + minLatLng.longitude) / 2),
-          zoom: 6,
+          initialZoom: 6,
           maxZoom: 15,
         ),
-        nonRotatedChildren: [
-          Builder(
-            builder: (context) =>
-                Text(FlutterMapState.maybeOf(context)!.zoom.toString()),
-          )
-        ],
         children: <Widget>[
           TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: const ['a', 'b', 'c'],
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.flutter_map_supercluster_example'
+          ),
+          Builder(
+            builder: (context) =>
+                Text(MapCamera.of(context).zoom.toString()),
           ),
           SuperclusterLayer.immutable(
             initialMarkers: markers,
@@ -131,7 +128,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage>
             ),
             calculateAggregatedClusterData: true,
             clusterWidgetSize: const Size(40, 40),
-            anchor: AnchorPos.align(AnchorAlign.center),
+            alignment: Alignment.center,
             popupOptions: PopupOptions(
               selectedMarkerBuilder: (context, marker) => const Icon(
                 Icons.pin_drop,

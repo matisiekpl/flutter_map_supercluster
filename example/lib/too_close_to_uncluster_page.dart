@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_supercluster/flutter_map_supercluster.dart';
 import 'package:flutter_map_supercluster_example/drawer.dart';
@@ -47,13 +47,12 @@ class _TooCloseToUnclusterPageState extends State<TooCloseToUnclusterPage>
     markers = points
         .map(
           (point) => Marker(
-            anchorPos: AnchorPos.align(AnchorAlign.top),
-            rotateAlignment: AnchorAlign.top.rotationAlignment,
+            alignment: Alignment.topCenter,
             height: 30,
             width: 30,
             point: point,
             rotate: true,
-            builder: (ctx) => const Icon(Icons.pin_drop),
+            child: const Icon(Icons.pin_drop),
           ),
         )
         .toList();
@@ -91,8 +90,8 @@ class _TooCloseToUnclusterPageState extends State<TooCloseToUnclusterPage>
         body: FlutterMap(
           mapController: _animatedMapController.mapController,
           options: MapOptions(
-            center: const LatLng(51.4931, -0.1003),
-            zoom: 10,
+            initialCenter: const LatLng(51.4931, -0.1003),
+            initialZoom: 10,
             maxZoom: 15,
             onTap: (_, __) {
               _superclusterController.collapseSplayedClusters();
@@ -100,8 +99,8 @@ class _TooCloseToUnclusterPageState extends State<TooCloseToUnclusterPage>
           ),
           children: <Widget>[
             TileLayer(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: const ['a', 'b', 'c'],
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.flutter_map_supercluster_example'
             ),
             SuperclusterLayer.immutable(
               initialMarkers: markers,
@@ -112,7 +111,7 @@ class _TooCloseToUnclusterPageState extends State<TooCloseToUnclusterPage>
                 zoom: zoom,
               ),
               clusterWidgetSize: const Size(40, 40),
-              anchor: AnchorPos.align(AnchorAlign.center),
+              alignment: Alignment.center,
               popupOptions: PopupOptions(
                 selectedMarkerBuilder: (context, marker) => const Icon(
                   Icons.pin_drop,

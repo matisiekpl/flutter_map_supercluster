@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:flutter_map_supercluster/flutter_map_supercluster.dart';
 import 'package:flutter_map_supercluster_example/drawer.dart';
@@ -42,13 +42,12 @@ class _NormalAndClusteredMarkersWithPopupsState
   }
 
   Marker _createMarker(LatLng point, Color color) => Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.top),
-        rotateAlignment: AnchorAlign.top.rotationAlignment,
+        alignment: Alignment.topCenter,
         height: 30,
         width: 30,
         point: point,
         rotate: true,
-        builder: (ctx) => Icon(Icons.pin_drop, color: color),
+        child: Icon(Icons.pin_drop, color: color),
       );
 
   @override
@@ -71,8 +70,8 @@ class _NormalAndClusteredMarkersWithPopupsState
         ),
         child: FlutterMap(
           options: MapOptions(
-            center: points[0],
-            zoom: 5,
+            initialCenter: points[0],
+            initialZoom: 5,
             maxZoom: 15,
             onTap: (_, __) {
               _popupController.hideAllPopups();
@@ -80,15 +79,15 @@ class _NormalAndClusteredMarkersWithPopupsState
           ),
           children: <Widget>[
             TileLayer(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: const ['a', 'b', 'c'],
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.flutter_map_supercluster_example'
             ),
             SuperclusterLayer.immutable(
               initialMarkers: markersA,
               indexBuilder: IndexBuilders.rootIsolate,
               controller: _superclusterController,
               clusterWidgetSize: const Size(40, 40),
-              anchor: AnchorPos.align(AnchorAlign.center),
+              alignment: Alignment.center,
               popupOptions: PopupOptions(
                 selectedMarkerBuilder: (context, marker) => Icon(
                   Icons.pin_drop,

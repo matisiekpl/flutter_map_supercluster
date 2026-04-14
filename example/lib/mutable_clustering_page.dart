@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_supercluster/flutter_map_supercluster.dart';
 import 'package:flutter_map_supercluster_example/drawer.dart';
@@ -82,8 +82,8 @@ class _MutableClusteringPageState extends State<MutableClusteringPage>
       body: FlutterMap(
         mapController: _animatedMapController.mapController,
         options: MapOptions(
-          center: _initialMarkers[0].point,
-          zoom: 5,
+          initialCenter: _initialMarkers[0].point,
+          initialZoom: 5,
           maxZoom: 15,
           onTap: (_, latLng) {
             debugPrint(latLng.toString());
@@ -92,8 +92,8 @@ class _MutableClusteringPageState extends State<MutableClusteringPage>
         ),
         children: <Widget>[
           TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: const ['a', 'b', 'c'],
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.flutter_map_supercluster_example'
           ),
           SuperclusterLayer.mutable(
             initialMarkers: _initialMarkers,
@@ -107,7 +107,7 @@ class _MutableClusteringPageState extends State<MutableClusteringPage>
               _superclusterController.remove(marker);
             },
             clusterWidgetSize: const Size(40, 40),
-            anchor: AnchorPos.align(AnchorAlign.center),
+            alignment: Alignment.center,
             calculateAggregatedClusterData: true,
             builder: (context, position, markerCount, extraClusterData) {
               return Container(
@@ -130,13 +130,12 @@ class _MutableClusteringPageState extends State<MutableClusteringPage>
   }
 
   static Marker _createMarker(LatLng point, Color color) => Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.top),
+        alignment: Alignment.topCenter,
         rotate: true,
-        rotateAlignment: AnchorAlign.top.rotationAlignment,
         height: 30,
         width: 30,
         point: point,
-        builder: (ctx) => Icon(
+        child: Icon(
           AccurateMapIcons.locationOnBottomAligned,
           color: color,
           size: 30,

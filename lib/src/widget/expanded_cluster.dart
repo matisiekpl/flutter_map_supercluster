@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_supercluster/src/layer/cluster_data.dart';
 import 'package:flutter_map_supercluster/src/layer/flutter_map_state_extension.dart';
 import 'package:flutter_map_supercluster/src/layer/supercluster_layer.dart';
@@ -26,7 +26,7 @@ class ExpandedCluster {
   ExpandedCluster({
     required TickerProvider vsync,
     required this.layerCluster,
-    required FlutterMapState mapState,
+    required MapCamera mapCamera,
     required List<LayerPoint<Marker>> layerPoints,
     required this.clusterSplayDelegate,
   })  : clusterData = layerCluster.clusterData as ClusterData,
@@ -37,10 +37,17 @@ class ExpandedCluster {
         displacedMarkers = clusterSplayDelegate.displaceMarkers(
           layerPoints.map((e) => e.originalPoint).toList(),
           clusterPosition: layerCluster.latLng,
-          project: (latLng) =>
-              mapState.project(latLng, layerCluster.highestZoom.toDouble()),
-          unproject: (point) =>
-              mapState.unproject(point, layerCluster.highestZoom.toDouble()),
+          project: (latLng) {
+            final offset = mapCamera.crs.latLngToOffset(
+              latLng,
+              layerCluster.highestZoom.toDouble(),
+            );
+            return Point<double>(offset.dx, offset.dy);
+          },
+          unproject: (point) => mapCamera.crs.offsetToLatLng(
+            Offset(point.x, point.y),
+            layerCluster.highestZoom.toDouble(),
+          ),
         ),
         maxMarkerSize = layerPoints.fold(
           Size.zero,
@@ -66,13 +73,13 @@ class ExpandedCluster {
   int get minimumVisibleZoom => layerCluster.highestZoom;
 
   List<DisplacedMarkerOffset> displacedMarkerOffsets(
-    FlutterMapState mapState,
-    CustomPoint clusterPosition,
+    MapCamera mapCamera,
+    Point<double> clusterPosition,
   ) =>
       clusterSplayDelegate.displacedMarkerOffsets(
         displacedMarkers,
         animation.value,
-        mapState.getPixelOffset,
+        mapCamera.getPixelOffset,
         clusterPosition,
       );
 
